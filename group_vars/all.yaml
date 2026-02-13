@@ -1,2 +1,9 @@
 MONGODB_HOST: mongodb.mokshithaaws.store
 REDIS_HOST: redis.mokshithaaws.store
+CATALOGUE_HOST: catalogue.mokshithaaws.store
+CART_HOST: cart.mokshithaaws.store
+USER_HOST: user.mokshithaaws.store
+RABBITMQ_HOST: rabbitmq.mokshithaaws.store
+MYSQL_HOST: mysql.mokshithaaws.store
+SHIPPING_HOST: shipping.mokshithaaws.store
+PAYMENT_HOST: payment.mokshithaaws.store
