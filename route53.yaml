@@ -1,62 +1,62 @@
 - name: create ec2 and r53 recors
-hosts: localhost
-connection: local
-vars:
-  ami_id: ami-0220d79f3f480ecf5
-  sg_id: sg-044d87d6d2f82a046
-  zone_id: "Z05208811T3YVS0BDHU92"
-  domain_id: "mokshithaaws.store"
-  #passing instaces though command line using -e option
-  # instances: 
-  #  - mongodb
-  #  - redis
-  #  - mysql
-  #  - rabbitmq
-tasks:
-- name: create ec2 instance
-  amazon.aws.ec2_instance:
-    name: "{{ item }}"
-    instance_type: t3.micro
-    security_group: "{{ sg_id }}"
-    image_id: "{{ ami_id }}"
-    tags:
-    Name: "{{ item }}"
-  loop: "{{ instances }}"
-  register: ec2_output
+  hosts: localhost
+  connection: local
+  vars:
+    ami_id: ami-0220d79f3f480ecf5
+    sg_id: sg-044d87d6d2f82a046
+    zone_id: "Z05208811T3YVS0BDHU92"
+    domain_id: "mokshithaaws.store"
+    #passing instaces though command line using -e option
+    # instances: 
+    #  - mongodb
+    #  - redis
+    #  - mysql
+    #  - rabbitmq
+  tasks:
+  - name: create ec2 instance
+    amazon.aws.ec2_instance:
+     name: "{{ item }}"
+     instance_type: t3.micro
+     security_group: "{{ sg_id }}"
+     image_id: "{{ ami_id }}"
+     tags:
+      Name: "{{ item }}"
+    loop: "{{ instances }}"
+    register: ec2_output
 
-- name: print the output of ec2 user
-  ansible.builtin.debug:
-    msg: "{{ ec2_output }}"
+  - name: print the output of ec2 user
+    ansible.builtin.debug:
+     msg: "{{ ec2_output }}"
 
-# - name: print private ip address
-#   ansible.builtin.debug: 
-#    msg: "{{ item.instances[0].private_ip_address}}"
-#   loop: "{{ ec2_output.results}}"
+  # - name: print private ip address
+  #   ansible.builtin.debug: 
+  #    msg: "{{ item.instances[0].private_ip_address}}"
+  #   loop: "{{ ec2_output.results}}"
 
-# - name: print public ip address
-#   ansible.builtin.debug:
-#    msg: "{{ item.instances[0].public_ip_address}}"
-#   loop: "{{ ec2_output.results}}"
+  # - name: print public ip address
+  #   ansible.builtin.debug:
+  #    msg: "{{ item.instances[0].public_ip_address}}"
+  #   loop: "{{ ec2_output.results}}"
 
-- name: create route53 record
-  amazon.aws.route53:
-    state: present
-    zone: "{{ domain_id }}"
-    record: "{{ item.item}}.{{ domain_id }}"
-    type: A
-    ttl: 1
-    value: "{{ item.instances[0].private_ip_address}}"
-    overwrite: true
-  loop: "{{ ec2_output.results}}"
+  - name: create route53 record
+    amazon.aws.route53:
+     state: present
+     zone: "{{ domain_id }}"
+     record: "{{ item.item}}.{{ domain_id }}"
+     type: A
+     ttl: 1
+     value: "{{ item.instances[0].private_ip_address}}"
+     overwrite: true
+    loop: "{{ ec2_output.results}}"
 
-- name: create route53 record for frontend public ip
-  amazon.aws.route53:
-    state: present
-    zone: "{{ domain_id }}"
-    record: "{{ domain_id }}"
-    type: A
-    ttl: 1
-    value: "{{ item.instances[0].public_ip_address}}"
-    overwrite: true
-  when:  item.item == "frontend"
-  loop: "{{ ec2_output.results}}"  
+  - name: create route53 record for frontend public ip
+    amazon.aws.route53:
+     state: present
+     zone: "{{ domain_id }}"
+     record: "{{ domain_id }}"
+     type: A
+     ttl: 1
+     value: "{{ item.instances[0].public_ip_address}}"
+     overwrite: true
+    when:  item.item == "frontend"
+    loop: "{{ ec2_output.results}}"  
